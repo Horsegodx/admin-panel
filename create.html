@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добавить объект</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <header class="app-header">
+    <a href="index.html" class="header-back">←</a>
+    <div class="header-title">Новый объект</div>
+  </header>
+
+  <div class="form-wrapper">
+
+    <input id="title" class="form-input" placeholder="Название объекта">
+
+    <input id="price" type="number" class="form-input" placeholder="Цена">
+
+    <textarea id="description" class="form-input"
+      placeholder="Описание"></textarea>
+
+    <input id="address" class="form-input" placeholder="Адрес">
+
+    <select id="category" class="form-input">
+      <option>Подвал</option>
+      <option>1 этаж</option>
+      <option>Магазин</option>
+    </select>
+
+    <input type="file" id="images" multiple class="form-input">
+
+    <button class="submit-btn" onclick="createObject()">
+      Сохранить объект
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+const API = "/api";
+
+async function createObject() {
+
+  const formData = new FormData();
+
+  formData.append("title", document.getElementById("title").value);
+  formData.append("price", document.getElementById("price").value);
+  formData.append("description", document.getElementById("description").value);
+  formData.append("address", document.getElementById("address").value);
+  formData.append("category", document.getElementById("category").value);
+
+  const files = document.getElementById("images").files;
+  for (let i = 0; i < files.length; i++) {
+    formData.append("images", files[i]);
+  }
+
+  await fetch(API + "/objects", {
+    method: "POST",
+    body: formData
+  });
+
+  window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>

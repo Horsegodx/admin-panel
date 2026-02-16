@@ -14,38 +14,14 @@
     <div class="header-title">Админ панель</div>
   </header>
 
+  <!-- Плавающий плюс -->
+  <a href="create.html" class="floating-add">+</a>
+
   <!-- КАТЕГОРИИ -->
   <div class="category-nav">
     <button class="category-link active" data-category="Подвал">Подвалы</button>
     <button class="category-link" data-category="1 этаж">1 этаж</button>
     <button class="category-link" data-category="Магазин">Магазины</button>
-  </div>
-
-  <!-- КНОПКА ДОБАВИТЬ -->
-  <div style="padding:20px;">
-    <button class="category-btn" onclick="toggleCreateForm()">
-      ➕ Добавить объект
-    </button>
-  </div>
-
-  <!-- ФОРМА -->
-  <div id="createForm" style="display:none; padding:20px;">
-    <input id="new-title" placeholder="Название"><br><br>
-    <input id="new-price" type="number" placeholder="Цена"><br><br>
-    <textarea id="new-description" placeholder="Описание"></textarea><br><br>
-    <input id="new-address" placeholder="Адрес"><br><br>
-
-    <select id="new-category">
-      <option>Подвал</option>
-      <option>1 этаж</option>
-      <option>Магазин</option>
-    </select><br><br>
-
-    <input type="file" id="new-images" multiple><br><br>
-
-    <button class="category-btn" onclick="createObject()">
-      Сохранить
-    </button>
   </div>
 
   <!-- СПИСОК -->
@@ -76,32 +52,41 @@ function renderObjects() {
   const filtered = allObjects.filter(o => o.category === currentCategory);
 
   filtered.forEach(obj => {
+
     const card = document.createElement("div");
     card.className = "property-card";
 
     card.innerHTML = `
       <div class="property-info">
-        <h3 contenteditable="true" onblur="updateField(${obj.id}, 'title', this.innerText)">
+
+        <h3 contenteditable="true"
+            onblur="updateField(${obj.id}, 'title', this.innerText)">
           ${obj.title}
         </h3>
 
-        <div class="address" contenteditable="true"
-          onblur="updateField(${obj.id}, 'address', this.innerText)">
+        <div class="address"
+             contenteditable="true"
+             onblur="updateField(${obj.id}, 'address', this.innerText)">
           ${obj.address || ""}
         </div>
 
-        <div class="description" contenteditable="true"
-          onblur="updateField(${obj.id}, 'description', this.innerText)">
+        <div class="description"
+             contenteditable="true"
+             onblur="updateField(${obj.id}, 'description', this.innerText)">
           ${obj.description || ""}
         </div>
 
-        <div class="property-price" contenteditable="true"
-          onblur="updateField(${obj.id}, 'price', this.innerText.replace(/[^0-9]/g,''))">
+        <div class="property-price"
+             contenteditable="true"
+             onblur="updateField(${obj.id}, 'price', this.innerText.replace(/[^0-9]/g,''))">
           ${Number(obj.price).toLocaleString()} ₽
         </div>
 
         <br>
-        <button onclick="deleteObject(${obj.id})">Удалить</button>
+        <button class="delete-btn" onclick="deleteObject(${obj.id})">
+          Удалить
+        </button>
+
       </div>
     `;
 
@@ -124,39 +109,10 @@ document.querySelectorAll(".category-link").forEach(btn => {
   });
 });
 
-/* ================= CREATE ================= */
-
-function toggleCreateForm() {
-  const form = document.getElementById("createForm");
-  form.style.display = form.style.display === "none" ? "block" : "none";
-}
-
-async function createObject() {
-  const formData = new FormData();
-
-  formData.append("title", document.getElementById("new-title").value);
-  formData.append("price", document.getElementById("new-price").value);
-  formData.append("description", document.getElementById("new-description").value);
-  formData.append("address", document.getElementById("new-address").value);
-  formData.append("category", document.getElementById("new-category").value);
-
-  const files = document.getElementById("new-images").files;
-  for (let i = 0; i < files.length; i++) {
-    formData.append("images", files[i]);
-  }
-
-  await fetch(API + "/objects", {
-    method: "POST",
-    body: formData
-  });
-
-  toggleCreateForm();
-  loadObjects();
-}
-
 /* ================= UPDATE ================= */
 
 async function updateField(id, field, value) {
+
   const object = allObjects.find(o => o.id === id);
 
   const updated = {

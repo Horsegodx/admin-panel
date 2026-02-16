@@ -533,3 +533,96 @@ body {
   text-decoration: none;
   letter-spacing: 0.3px;
 }
+
+
+/* ===============================
+   ➕ ПЛАВАЮЩАЯ КНОПКА ДОБАВИТЬ
+================================ */
+
+.floating-add {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+
+  width: 56px;
+  height: 56px;
+
+  border-radius: 50%;
+  background: var(--cold-sky);
+  color: white;
+
+  font-size: 30px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.floating-add:hover {
+  transform: scale(1.08);
+  background: var(--frost);
+}
+
+
+/* ===============================
+   📝 ФОРМА СОЗДАНИЯ
+================================ */
+
+.form-wrapper {
+  padding: 28px 20px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px 18px;
+
+  border-radius: 18px;
+  border: 2px solid rgba(59,95,111,0.25);
+
+  font-size: 1rem;
+  font-family: inherit;
+
+  background: var(--white);
+  color: var(--frost);
+
+  outline: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+  border-color: var(--cold-sky);
+  box-shadow: 0 0 0 3px rgba(105,145,170,0.2);
+}
+
+textarea.form-input {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.submit-btn {
+  padding: 16px;
+  border-radius: 22px;
+
+  background: var(--cold-sky);
+  color: white;
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  background: var(--frost);
+}
