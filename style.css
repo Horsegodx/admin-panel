@@ -1,0 +1,535 @@
+/* =====================================================
+   🎨 ЦВЕТОВАЯ ПАЛИТРА
+   ===================================================== */
+:root {
+  --wool: #dddfde;
+  --caramel: #c1b3a8;
+  --cookies: #a48e80;
+  --cold-sky: #6991aa;
+  --frost: #365a72;
+  --white: #ffffff;
+}
+
+/* =====================================================
+   🔧 RESET
+   ===================================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--wool);
+  color: var(--frost);
+}
+
+/* =====================================================
+   📦 ОСНОВНОЙ КОНТЕЙНЕР
+   ===================================================== */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--wool);
+  display: flex;
+  flex-direction: column;
+}
+
+/* =====================================================
+   🧭 APP HEADER (ЕДИНЫЙ)
+   ===================================================== */
+.app-header {
+  position: relative;
+  background: var(--cold-sky);
+  color: var(--white);
+  padding: 24px 20px;
+  text-align: center;
+}
+
+/* кнопка назад */
+.header-back {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  font-size: 2.2rem;        /* 🔴 РАЗМЕР СТРЕЛКИ */
+  padding: 6px 8px;
+
+  color: var(--white);
+  border-radius: 12px;
+  transition: background-color 0.15s ease;
+}
+
+.header-back:active {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+/* заголовок */
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* =====================================================
+   👤 ПРОФИЛЬ (ГЛАВНАЯ)
+   ===================================================== */
+.profile-photo {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid rgba(255,255,255,0.9);
+}
+
+.profile-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-name {
+  font-size: 1.9rem;
+  font-weight: 700;
+}
+
+.profile-title {
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+/* =====================================================
+   🔘 КНОПКИ КАТЕГОРИЙ (ГЛАВНАЯ)
+   ===================================================== */
+.buttons-grid {
+  display: grid;
+  gap: 22px;
+  max-width: 420px;
+  margin: 40px auto;
+}
+
+.category-btn {
+  width: 100%;                 /* растягивается внутри контейнера */
+  max-width: 340px;            /* 🔴 ОДИНАКОВАЯ ШИРИНА ДЛЯ ВСЕХ */
+  margin: 0 auto;
+
+  padding: 18px 22px;
+  border-radius: 18px;
+
+  background: var(--caramel);
+  color: var(--frost);
+
+  font-size: 1.05rem;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;     /* 🔴 ЦЕНТР ПО ГОРИЗОНТАЛИ */
+  gap: 12px;
+
+  text-align: center;          /* 🔴 ТЕКСТ ПО ЦЕНТРУ */
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+
+.category-btn:hover {
+  background: #d1c3b8;
+  transform: translateY(-2px);
+}
+
+/* =====================================================
+   📑 НАВИГАЦИЯ КАТЕГОРИЙ
+   ===================================================== */
+.category-nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.category-link {
+  min-width: 110px;
+  padding: 10px 14px;
+
+  background: var(--white);
+  border-radius: 14px;
+  border: 2px solid rgba(59,95,111,0.25);
+
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+
+  transition: transform 0.2s ease;
+}
+
+.category-link.active {
+  background: var(--cold-sky);
+  color: var(--white);
+  border-color: var(--cold-sky);
+}
+
+.category-link:hover {
+  transform: translateY(-1px);
+}
+
+/* =====================================================
+   💰 ФИЛЬТР ПО ЦЕНЕ — В СТРОЧКУ С ПРОКРУТКОЙ
+   ===================================================== */
+
+.price-filter-bar {
+  display: flex;
+  gap: 12px;
+  padding: 16px 16px 6px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+.price-filter-bar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===== КНОПКИ ЦЕНЫ (КАК CATEGORY) ===== */
+.price-filter-btn {
+  flex: 0 0 auto;              /* 🔴 ВАЖНО: НЕ СЖИМАТЬСЯ */
+
+  min-width: 120px;
+  height: 44px;
+
+  padding: 0 16px;
+  border-radius: 18px;
+
+  background: #ffffff;
+  color: var(--frost);
+
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid rgba(59, 95, 111, 0.25);
+  cursor: pointer;
+
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+/* Активная */
+.price-filter-btn.active {
+  background: var(--cold-sky);
+  color: #ffffff;
+  border-color: var(--cold-sky);
+}
+
+/* Hover */
+.price-filter-btn:hover {
+  transform: translateY(-1px);
+}
+
+
+
+/* =====================================================
+   🏠 КАРТОЧКИ ОБЪЕКТОВ (АККУРАТНО, КАК ЦИАН)
+   ===================================================== */
+
+/* ===== СЕТКА КАРТОЧЕК ===== */
+.properties-grid {
+  display: grid;
+  grid-template-columns: 1fr;     /* Одна карточка в ряд */
+  gap: 26px;
+
+  padding: 24px 16px;             /* Воздух от краёв экрана */
+}
+
+/* ===== КАРТОЧКА ===== */
+.property-card {
+  width: 100%;
+  max-width: 520px;               /* ❗ КАРТОЧКА НЕ ВО ВЕСЬ ЭКРАН */
+  margin: 0 auto;                 /* ❗ ЦЕНТРУЕМ */
+
+  background: var(--caramel);
+  border-radius: 22px;
+  overflow: hidden;
+
+  box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+}
+
+/* ===== ФОТО ===== */
+.property-image {
+  width: 100%;
+  height: 220px;                  /* ❗ АККУРАТНАЯ ВЫСОТА */
+  object-fit: cover;
+  display: block;
+}
+
+/* ===== КОНТЕНТ ===== */
+.property-info {
+  padding: 20px 22px 22px;
+  text-align: left;               /* ❗ ВЫРАВНИВАНИЕ СЛЕВА */
+}
+
+/* Заголовок */
+.property-info h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--frost);
+  margin-bottom: 10px;
+}
+
+/* Адрес */
+.address {
+  font-size: 0.95rem;
+  color: var(--frost);
+  margin-bottom: 10px;
+}
+
+/* Описание */
+.description {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--frost);
+  margin-bottom: 16px;
+}
+
+/* Цена */
+.property-price {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--frost);
+}
+
+
+/* ===============================
+   🧾 СТРАНИЦА ОБЪЕКТА (ФИНАЛ)
+   =============================== */
+
+/* HEADER */
+.property-header {
+  position: relative;
+  height: 68px;
+  background: var(--cold-sky);
+}
+
+/* Кнопки */
+.back-btn,
+.share-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 10px 16px;
+  border-radius: 14px;
+}
+
+.back-btn {
+  left: 8px;
+  font-size: 2rem;
+}
+
+.share-btn {
+  right: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.back-btn:active,
+.share-btn:active {
+  background: rgba(0,0,0,0.18);
+}
+
+/* ===============================
+   📸 СЛАЙДЕР
+   =============================== */
+
+.property-slider {
+  margin: 16px;
+  border-radius: 22px;
+  overflow: hidden;
+  height: 260px;
+  position: relative;
+  background: var(--cookies);
+}
+
+.property-slider img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Кнопки листания */
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(54, 90, 114, 0.7);
+  color: white;
+  border: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.slider-btn.prev {
+  left: 12px;
+}
+
+.slider-btn.next {
+  right: 12px;
+}
+
+/* ===============================
+   🧾 КАРТОЧКА ОПИСАНИЯ
+   =============================== */
+
+.property-page-content {
+  background: var(--caramel);
+  border-radius: 22px;
+  margin: 0 16px 32px;   /* 👈 РОВНО КАК СЛАЙДЕР */
+  padding: 22px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+}
+
+/* Текст */
+.property-page-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--frost);
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.property-page-address {
+  font-size: 0.95rem;
+  color: var(--frost);
+  margin-bottom: 12px;
+}
+
+.property-page-description {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--frost);
+  margin-bottom: 18px;
+}
+
+.property-page-price {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--frost);
+}
+
+/* ===============================
+   📞 ФУТЕР (ЦЕНТР)
+   =============================== */
+
+.site-footer {
+  background: var(--cold-sky);
+  padding: 36px 20px 40px;
+  text-align: center;
+}
+
+.footer-social {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.footer-social a {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #2AABEE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-social svg {
+  width: 26px;
+  height: 26px;
+  fill: white;
+}
+
+.footer-phone {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+  text-decoration: none;
+}
+
+
+
+
+/* =====================================================
+   📋 КОНТЕНТ ОБЪЕКТА
+   ===================================================== */
+.property-page-content {
+  background: var(--caramel);
+  border-radius: 22px;
+  padding: 26px 24px;
+  margin: 24px 20px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+}
+
+/* =====================================================
+   📞 FOOTER (РОВНО, КРАСИВО, ПО ЦЕНТРУ)
+   ===================================================== */
+
+.site-footer {
+  background: var(--cold-sky);
+  padding: 36px 20px 44px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* ===== TELEGRAM BUTTON ===== */
+.tg-btn {
+  width: 64px;
+  height: 64px;
+
+  border-radius: 50%;
+  background: #2AABEE;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+}
+
+/* ИКОНКА */
+.tg-btn svg {
+  width: 28px;
+  height: 28px;
+  fill: white;
+}
+
+/* ===== PHONE ===== */
+.footer-phone {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: white;
+  text-decoration: none;
+  letter-spacing: 0.3px;
+}
