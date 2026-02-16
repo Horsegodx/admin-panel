@@ -14,12 +14,21 @@
     <div class="header-title">Админ панель</div>
   </header>
 
+  <!-- КАТЕГОРИИ -->
+  <div class="category-nav">
+    <button class="category-link active" data-category="Подвал">Подвалы</button>
+    <button class="category-link" data-category="1 этаж">1 этаж</button>
+    <button class="category-link" data-category="Магазин">Магазины</button>
+  </div>
+
+  <!-- КНОПКА ДОБАВИТЬ -->
   <div style="padding:20px;">
     <button class="category-btn" onclick="toggleCreateForm()">
       ➕ Добавить объект
     </button>
   </div>
 
+  <!-- ФОРМА -->
   <div id="createForm" style="display:none; padding:20px;">
     <input id="new-title" placeholder="Название"><br><br>
     <input id="new-price" type="number" placeholder="Цена"><br><br>
@@ -39,32 +48,58 @@
     </button>
   </div>
 
+  <!-- СПИСОК -->
   <div class="properties-grid" id="objectsContainer"></div>
 
 </div>
 
 <script>
 const API = "/api";
+let allObjects = [];
+let currentCategory = "Подвал";
+
+/* ================= LOAD ================= */
 
 async function loadObjects() {
   const res = await fetch(API + "/objects");
   const data = await res.json();
+  allObjects = data;
+  renderObjects();
+}
 
+/* ================= RENDER ================= */
+
+function renderObjects() {
   const container = document.getElementById("objectsContainer");
   container.innerHTML = "";
 
-  data.forEach(obj => {
+  const filtered = allObjects.filter(o => o.category === currentCategory);
+
+  filtered.forEach(obj => {
     const card = document.createElement("div");
     card.className = "property-card";
 
     card.innerHTML = `
       <div class="property-info">
-        <h3>${obj.title}</h3>
-        <div class="address">${obj.address || ""}</div>
-        <div class="description">${obj.description || ""}</div>
-        <div class="property-price">
+        <h3 contenteditable="true" onblur="updateField(${obj.id}, 'title', this.innerText)">
+          ${obj.title}
+        </h3>
+
+        <div class="address" contenteditable="true"
+          onblur="updateField(${obj.id}, 'address', this.innerText)">
+          ${obj.address || ""}
+        </div>
+
+        <div class="description" contenteditable="true"
+          onblur="updateField(${obj.id}, 'description', this.innerText)">
+          ${obj.description || ""}
+        </div>
+
+        <div class="property-price" contenteditable="true"
+          onblur="updateField(${obj.id}, 'price', this.innerText.replace(/[^0-9]/g,''))">
           ${Number(obj.price).toLocaleString()} ₽
         </div>
+
         <br>
         <button onclick="deleteObject(${obj.id})">Удалить</button>
       </div>
@@ -73,6 +108,23 @@ async function loadObjects() {
     container.appendChild(card);
   });
 }
+
+/* ================= CATEGORY ================= */
+
+document.querySelectorAll(".category-link").forEach(btn => {
+  btn.addEventListener("click", () => {
+
+    document.querySelectorAll(".category-link")
+      .forEach(b => b.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    currentCategory = btn.dataset.category;
+    renderObjects();
+  });
+});
+
+/* ================= CREATE ================= */
 
 function toggleCreateForm() {
   const form = document.getElementById("createForm");
@@ -101,6 +153,32 @@ async function createObject() {
   toggleCreateForm();
   loadObjects();
 }
+
+/* ================= UPDATE ================= */
+
+async function updateField(id, field, value) {
+  const object = allObjects.find(o => o.id === id);
+
+  const updated = {
+    title: object.title,
+    price: object.price,
+    description: object.description,
+    address: object.address,
+    category: object.category
+  };
+
+  updated[field] = value;
+
+  await fetch(API + "/objects/" + id, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updated)
+  });
+
+  loadObjects();
+}
+
+/* ================= DELETE ================= */
 
 async function deleteObject(id) {
   await fetch(API + "/objects/" + id, {
