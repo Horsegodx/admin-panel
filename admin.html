@@ -1,92 +1,46 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel</title>
-<link rel="stylesheet" href="style.css">
-
-<style>
-.admin-header {
-  padding: 16px;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.admin-btn {
-  background: black;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  margin-bottom: 15px;
-}
-
-.admin-card {
-  background: #f6f6f6;
-  padding: 15px;
-  border-radius: 16px;
-  margin-bottom: 15px;
-}
-
-.admin-card img {
-  width: 100%;
-  border-radius: 12px;
-  margin-bottom: 10px;
-}
-
-.admin-form input,
-.admin-form textarea,
-.admin-form select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  margin-bottom: 10px;
-}
-
-.admin-delete {
-  background: #ff3b30;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 10px;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админ панель</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+
 <div class="container">
 
-<div class="admin-header">
-  Админ панель
-</div>
+  <header class="app-header">
+    <div class="header-title">Админ панель</div>
+  </header>
 
-<button class="admin-btn" onclick="openCreateForm()">
-  + Добавить объект
-</button>
+  <div style="padding:20px;">
+    <button class="category-btn" onclick="toggleCreateForm()">
+      ➕ Добавить объект
+    </button>
+  </div>
 
-<div id="createForm" style="display:none;">
-  <div class="admin-card admin-form">
-    <input id="newTitle" placeholder="Название">
-    <input id="newPrice" placeholder="Цена">
-    <textarea id="newDescription" placeholder="Описание"></textarea>
-    <input id="newAddress" placeholder="Адрес">
+  <!-- Форма создания -->
+  <div id="createForm" style="display:none; padding:20px;">
+    <input id="new-title" placeholder="Название"><br><br>
+    <input id="new-price" type="number" placeholder="Цена"><br><br>
+    <textarea id="new-description" placeholder="Описание"></textarea><br><br>
+    <input id="new-address" placeholder="Адрес"><br><br>
 
-    <select id="newCategory">
+    <select id="new-category">
       <option>Подвал</option>
       <option>1 этаж</option>
       <option>Магазин</option>
-    </select>
+    </select><br><br>
 
-    <input type="file" id="newImages" multiple>
+    <input type="file" id="new-images" multiple><br><br>
 
-    <button class="admin-btn" onclick="createObject()">Сохранить</button>
+    <button class="category-btn" onclick="createObject()">
+      Сохранить
+    </button>
   </div>
-</div>
 
-<div id="objectsList"></div>
+  <div class="properties-grid" id="objectsContainer"></div>
 
 </div>
 
@@ -97,35 +51,31 @@ async function loadObjects() {
   const res = await fetch(API + "/objects");
   const data = await res.json();
 
-  const container = document.getElementById("objectsList");
+  const container = document.getElementById("objectsContainer");
   container.innerHTML = "";
 
   data.forEach(obj => {
     const card = document.createElement("div");
-    card.className = "admin-card";
-
-    let imagesHTML = "";
-    if (obj.images && obj.images.length > 0) {
-      imagesHTML = obj.images.map(img =>
-        `<img src="${API}${img}">`
-      ).join("");
-    }
+    card.className = "property-card";
 
     card.innerHTML = `
-      ${imagesHTML}
-      <h3>${obj.title}</h3>
-      <p>${obj.price} ₽</p>
-      <p>${obj.address}</p>
-      <button class="admin-delete" onclick="deleteObject(${obj.id})">
-        Удалить
-      </button>
+      <div class="property-info">
+        <h3>${obj.title}</h3>
+        <div class="address">${obj.address || ""}</div>
+        <div class="description">${obj.description || ""}</div>
+        <div class="property-price">
+          ${Number(obj.price).toLocaleString()} ₽
+        </div>
+        <br>
+        <button onclick="deleteObject(${obj.id})">Удалить</button>
+      </div>
     `;
 
     container.appendChild(card);
   });
 }
 
-function openCreateForm() {
+function toggleCreateForm() {
   const form = document.getElementById("createForm");
   form.style.display = form.style.display === "none" ? "block" : "none";
 }
@@ -133,13 +83,13 @@ function openCreateForm() {
 async function createObject() {
   const formData = new FormData();
 
-  formData.append("title", document.getElementById("newTitle").value);
-  formData.append("price", document.getElementById("newPrice").value);
-  formData.append("description", document.getElementById("newDescription").value);
-  formData.append("address", document.getElementById("newAddress").value);
-  formData.append("category", document.getElementById("newCategory").value);
+  formData.append("title", document.getElementById("new-title").value);
+  formData.append("price", document.getElementById("new-price").value);
+  formData.append("description", document.getElementById("new-description").value);
+  formData.append("address", document.getElementById("new-address").value);
+  formData.append("category", document.getElementById("new-category").value);
 
-  const files = document.getElementById("newImages").files;
+  const files = document.getElementById("new-images").files;
   for (let i = 0; i < files.length; i++) {
     formData.append("images", files[i]);
   }
@@ -149,8 +99,8 @@ async function createObject() {
     body: formData
   });
 
+  toggleCreateForm();
   loadObjects();
-  document.getElementById("createForm").style.display = "none";
 }
 
 async function deleteObject(id) {
@@ -163,5 +113,6 @@ async function deleteObject(id) {
 
 loadObjects();
 </script>
+
 </body>
 </html>
