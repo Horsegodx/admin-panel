@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Редактирование</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <header class="app-header">
+    <a href="index.html" class="header-back">←</a>
+    <div class="header-title">Редактирование</div>
+  </header>
+
+  <div class="form-wrapper">
+
+    <div id="existingImages" class="image-preview-grid"></div>
+
+    <input id="title" class="form-input">
+    <input id="price" type="number" class="form-input">
+    <textarea id="description" class="form-input"></textarea>
+    <input id="address" class="form-input">
+
+    <select id="category" class="form-input">
+      <option>Подвал</option>
+      <option>1 этаж</option>
+      <option>Магазин</option>
+    </select>
+
+    <input type="file" id="images" multiple class="form-input">
+    <div id="preview" class="image-preview-grid"></div>
+
+    <button class="submit-btn" onclick="updateObject()">
+      Сохранить
+    </button>
+
+    <button class="delete-btn" onclick="deleteObject()">
+      Удалить объект
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+const API = "/api";
+const id = new URLSearchParams(window.location.search).get("id");
+let currentObject = null;
+
+async function loadObject() {
+  const res = await fetch(API + "/objects");
+  const data = await res.json();
+  currentObject = data.find(o => o.id == id);
+
+  document.getElementById("title").value = currentObject.title;
+  document.getElementById("price").value = currentObject.price;
+  document.getElementById("description").value = currentObject.description;
+  document.getElementById("address").value = currentObject.address;
+  document.getElementById("category").value = currentObject.category;
+
+  renderExistingImages();
+}
+
+function renderExistingImages() {
+  const container = document.getElementById("existingImages");
+  container.innerHTML = "";
+
+  if (!currentObject.images) return;
+
+  currentObject.images.forEach(img => {
+    const image = document.createElement("img");
+    image.src = API.replace('/api','') + img;
+    container.appendChild(image);
+  });
+}
+
+document.getElementById("images").addEventListener("change", function() {
+  const preview = document.getElementById("preview");
+  preview.innerHTML = "";
+
+  Array.from(this.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement("img");
+      img.src = e.target.result;
+      preview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+});
+
+async function updateObject() {
+  const formData = new FormData();
+
+  formData.append("title", title.value);
+  formData.append("price", price.value);
+  formData.append("description", description.value);
+  formData.append("address", address.value);
+  formData.append("category", category.value);
+
+  const files = document.getElementById("images").files;
+  for (let i = 0; i < files.length; i++) {
+    formData.append("images", files[i]);
+  }
+
+  await fetch(API + "/objects/" + id, {
+    method: "PUT",
+    body: formData
+  });
+
+  window.location.href = "index.html";
+}
+
+async function deleteObject() {
+  await fetch(API + "/objects/" + id, { method: "DELETE" });
+  window.location.href = "index.html";
+}
+
+loadObject();
+</script>
+
+</body>
+</html>
