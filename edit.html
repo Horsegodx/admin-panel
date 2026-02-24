@@ -33,20 +33,15 @@
     <input type="file" id="images" multiple class="form-input">
     <div id="preview" class="image-preview-grid"></div>
 
-    <button class="submit-btn" onclick="updateObject()">
-      Сохранить
-    </button>
-
-    <button class="delete-btn" onclick="deleteObject()">
-      Удалить объект
-    </button>
+    <button class="submit-btn" onclick="updateObject()">Сохранить</button>
+    <button class="delete-btn" onclick="deleteObject()">Удалить</button>
 
   </div>
 
 </div>
 
 <script>
-const API = "/api";
+const API = "https://api.evgeny-ivanov-premises.ru";
 const id = new URLSearchParams(window.location.search).get("id");
 let currentObject = null;
 
@@ -55,11 +50,11 @@ async function loadObject() {
   const data = await res.json();
   currentObject = data.find(o => o.id == id);
 
-  document.getElementById("title").value = currentObject.title;
-  document.getElementById("price").value = currentObject.price;
-  document.getElementById("description").value = currentObject.description;
-  document.getElementById("address").value = currentObject.address;
-  document.getElementById("category").value = currentObject.category;
+  title.value = currentObject.title;
+  price.value = currentObject.price;
+  description.value = currentObject.description;
+  address.value = currentObject.address;
+  category.value = currentObject.category;
 
   renderExistingImages();
 }
@@ -72,7 +67,7 @@ function renderExistingImages() {
 
   currentObject.images.forEach(img => {
     const image = document.createElement("img");
-    image.src = API.replace('/api','') + img;
+    image.src = API + img;
     container.appendChild(image);
   });
 }

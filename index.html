@@ -47,7 +47,7 @@ function renderObjects() {
 
     const image = obj.images && obj.images.length > 0
       ? obj.images[0]
-      : "";
+      : null;
 
     const card = document.createElement("div");
     card.className = "property-card";
@@ -56,7 +56,7 @@ function renderObjects() {
     };
 
     card.innerHTML = `
-      ${image ? `<img src="${API.replace('/api','')}${image}" class="property-image">` : ""}
+      ${image ? `<img src="${API}${image}" class="property-image">` : ""}
       <div class="property-info">
         <h3>${obj.title}</h3>
         <div class="address">${obj.address || ""}</div>
