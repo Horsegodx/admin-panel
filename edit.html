@@ -8,6 +8,18 @@
 </head>
 <body>
 
+<div id="deleteModal" style="display:none;">
+  <div class="modal-overlay">
+    <div class="modal">
+      <h3>Вы точно хотите удалить объект?</h3>
+      <div class="modal-buttons">
+        <button class="modal-cancel" onclick="closeModal()">Отмена</button>
+        <button class="modal-confirm" onclick="confirmDelete()">Удалить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="container">
 
   <header class="app-header">
@@ -165,7 +177,15 @@ async function updateObject() {
   window.location.href = "index.html";
 }
 
-async function deleteObject() {
+function deleteObject() {
+  document.getElementById("deleteModal").style.display = "block";
+}
+
+function closeModal() {
+  document.getElementById("deleteModal").style.display = "none";
+}
+
+async function confirmDelete() {
   await fetch(API + "/objects/" + id, { method: "DELETE" });
   window.location.href = "index.html";
 }
