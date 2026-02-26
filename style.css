@@ -628,42 +628,67 @@ textarea.form-input {
 }
 
 
+/* ===============================
+   📸 ПРЕВЬЮ ФОТО
+================================ */
+
 .image-preview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
 }
 
-.image-preview-grid img {
-  width: 100%;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 12px;
-}
-
-
+/* Контейнер одной картинки */
 .preview-item {
   position: relative;
-  display: inline-block;
-  margin: 8px;
+  width: 100%;
 }
 
+/* Сами фото — увеличили */
 .preview-item img {
-  width: 240px;
-  height: 180px;
+  width: 100%;
+  height: 220px;              /* было 90 / 180 */
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 18px;
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  transition: transform 0.2s ease;
+  cursor: grab;
 }
 
+.preview-item img:hover {
+  transform: scale(1.02);
+}
+
+/* Круглый крестик справа сверху */
+.remove-btn,
 .preview-item button {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  background: red;
-  color: white;
-  border: none;
+  top: 10px;
+  right: 10px;
+
+  width: 34px;
+  height: 34px;
+
   border-radius: 50%;
-  width: 22px;
-  height: 22px;
+  border: none;
+
+  background: rgba(0,0,0,0.6);
+  color: white;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.remove-btn:hover,
+.preview-item button:hover {
+  background: #ff3b3b;
+  transform: scale(1.1);
 }
