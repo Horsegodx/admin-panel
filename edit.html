@@ -1,44 +1,85 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Редактирование</title>
-<link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Редактирование</title>
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
+<div id="deleteModal" style="display:none;">
+  <div class="modal-overlay">
+    <div class="modal">
+      <h3>Вы точно хотите удалить объект?</h3>
+      <div class="modal-buttons">
+        <button class="modal-cancel" onclick="closeModal()">Отмена</button>
+        <button class="modal-confirm" onclick="confirmDelete()">Удалить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="container">
-<header class="app-header">
-<a href="index.html" class="header-back">←</a>
-<div class="header-title">Редактирование</div>
-</header>
 
-<div class="form-wrapper">
-<input id="title" class="form-input">
-<input id="price" type="number" class="form-input">
-<textarea id="description" class="form-input"></textarea>
-<input id="address" class="form-input">
+  <header class="app-header">
+    <a href="index.html" class="header-back">←</a>
+    <div class="header-title">Редактирование</div>
+  </header>
 
-<select id="category" class="form-input">
-<option>Подвал</option>
-<option>1 этаж</option>
-<option>Магазин</option>
-</select>
+  <div class="form-wrapper">
 
-<input type="file" id="images" multiple class="form-input">
-<button class="submit-btn" onclick="updateObject()">Сохранить</button>
-<button class="delete-btn" onclick="deleteObject()">Удалить</button>
+    <div id="existingImages" class="image-preview-grid"></div>
+
+    <input id="title" class="form-input">
+    <input id="price" type="number" class="form-input">
+    <textarea id="description" class="form-input"></textarea>
+    <input id="address" class="form-input">
+
+    <select id="category" class="form-input">
+      <option>Подвал</option>
+      <option>1 этаж</option>
+      <option>Магазин</option>
+    </select>
+
+    <input type="file" id="images" multiple class="form-input">
+    <div id="preview" class="image-preview-grid"></div>
+
+    <button class="submit-btn" onclick="updateObject()">Сохранить</button>
+    <button class="delete-btn" onclick="deleteObject()">Удалить</button>
+
+  </div>
+
 </div>
-</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
 <script>
 const API = "https://api.evgeny-ivanov-premises.ru";
 const id = new URLSearchParams(window.location.search).get("id");
 
-/* ПРОВЕРКА АВТОРИЗАЦИИ */
-fetch(API + "/check-auth", { credentials: "include" })
-.then(res => { if (!res.ok) window.location.href = "login.html"; });
+async function checkAuth() {
+  const res = await fetch(API + "/check-auth", {
+    credentials: "include"
+  });
+
+  if (!res.ok) {
+    window.location.href = "login.html";
+  }
+}
+
+checkAuth();
+
+let imageFiles = [];
+let existingImages = [];
+
+const existingContainer = document.getElementById("existingImages");
+const preview = document.getElementById("preview");
+
+new Sortable(existingContainer, {
+  animation: 150,
+  onEnd: saveOrder
+});
 
 async function loadObject() {
   const res = await fetch(API + "/objects/" + id, {
@@ -46,17 +87,94 @@ async function loadObject() {
   });
 
   if (!res.ok) {
-    window.location.href = "login.html";
+    alert("Ошибка загрузки");
     return;
   }
 
-  const obj = await res.json();
+  const currentObject = await res.json();
 
-  title.value = obj.title;
-  price.value = obj.price;
-  description.value = obj.description;
-  address.value = obj.address;
-  category.value = obj.category;
+  title.value = currentObject.title;
+  price.value = currentObject.price;
+  description.value = currentObject.description;
+  address.value = currentObject.address;
+  category.value = currentObject.category;
+
+  existingImages = [...currentObject.images];
+  renderExisting();
+}
+
+function renderExisting() {
+  existingContainer.innerHTML = "";
+
+  existingImages.forEach((img, index) => {
+    const div = document.createElement("div");
+    div.className = "preview-item";
+
+    div.innerHTML = `
+      <img src="${API + img}">
+      <button type="button" class="remove-btn" onclick="deleteImage(${index})">×</button>
+    `;
+
+    existingContainer.appendChild(div);
+  });
+}
+
+async function deleteImage(index) {
+  const img = existingImages[index];
+
+  await fetch(API + "/objects/" + id + "/images", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ image: img }),
+    credentials: "include"
+  });
+
+  existingImages.splice(index, 1);
+  renderExisting();
+}
+
+async function saveOrder() {
+  const newOrder = Array.from(existingContainer.querySelectorAll("img"))
+    .map(img => img.src.replace(API, ""));
+
+  await fetch(API + "/objects/" + id + "/images/order", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ images: newOrder }),
+    credentials: "include"
+  });
+}
+
+document.getElementById("images").addEventListener("change", function() {
+  Array.from(this.files).forEach(file => {
+    imageFiles.push(file);
+  });
+  renderNewPreview();
+});
+
+function renderNewPreview() {
+  preview.innerHTML = "";
+
+  imageFiles.forEach((file, index) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const div = document.createElement("div");
+      div.className = "preview-item";
+
+      div.innerHTML = `
+        <img src="${e.target.result}">
+        <button type="button" class="remove-btn" onclick="removeNewImage(${index})">×</button>
+      `;
+
+      preview.appendChild(div);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeNewImage(index) {
+  imageFiles.splice(index, 1);
+  renderNewPreview();
 }
 
 async function updateObject() {
@@ -68,24 +186,28 @@ async function updateObject() {
   formData.append("address", address.value);
   formData.append("category", category.value);
 
-  const res = await fetch(API + "/objects/" + id, {
+  imageFiles.forEach(file => {
+    formData.append("images", file);
+  });
+
+  await fetch(API + "/objects/" + id, {
     method: "PUT",
     body: formData,
     credentials: "include"
   });
 
-  if (!res.ok) {
-    alert("Ошибка обновления");
-    return;
-  }
-
   window.location.href = "index.html";
 }
 
-async function deleteObject() {
-  const confirmDelete = confirm("Вы точно хотите удалить объект?");
-  if (!confirmDelete) return;
+function deleteObject() {
+  document.getElementById("deleteModal").style.display = "block";
+}
 
+function closeModal() {
+  document.getElementById("deleteModal").style.display = "none";
+}
+
+async function confirmDelete() {
   await fetch(API + "/objects/" + id, {
     method: "DELETE",
     credentials: "include"

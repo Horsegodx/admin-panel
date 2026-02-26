@@ -9,6 +9,7 @@
 <body>
 
 <div class="container">
+
   <header class="app-header">
     <div class="header-title">Админ панель</div>
   </header>
@@ -22,12 +23,12 @@
   </div>
 
   <div class="properties-grid" id="objectsContainer"></div>
+
 </div>
 
 <script>
 const API = "https://api.evgeny-ivanov-premises.ru";
 
-/* ===== ПРОВЕРКА АВТОРИЗАЦИИ ===== */
 async function checkAuth() {
   const res = await fetch(API + "/check-auth", {
     credentials: "include"
@@ -40,7 +41,6 @@ async function checkAuth() {
 
 checkAuth();
 
-/* ===== ЗАГРУЗКА ОБЪЕКТОВ ===== */
 let allObjects = [];
 let currentCategory = "Подвал";
 
@@ -145,5 +145,6 @@ document.querySelectorAll(".category-link").forEach(btn => {
 
 loadObjects();
 </script>
+
 </body>
 </html>
