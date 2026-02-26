@@ -1,97 +1,49 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Добавить объект</title>
-  <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Добавить объект</title>
+<link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
 <div class="container">
+<header class="app-header">
+<a href="index.html" class="header-back">←</a>
+<div class="header-title">Новый объект</div>
+</header>
 
-  <header class="app-header">
-    <a href="index.html" class="header-back">←</a>
-    <div class="header-title">Новый объект</div>
-  </header>
+<div class="form-wrapper">
+<input id="title" class="form-input" placeholder="Название">
+<input id="price" type="number" class="form-input" placeholder="Цена">
+<textarea id="description" class="form-input" placeholder="Описание"></textarea>
+<input id="address" class="form-input" placeholder="Адрес">
 
-  <div class="form-wrapper">
+<select id="category" class="form-input">
+<option>Подвал</option>
+<option>1 этаж</option>
+<option>Магазин</option>
+</select>
 
-    <input id="title" class="form-input" placeholder="Название">
-    <input id="price" type="number" class="form-input" placeholder="Цена">
-    <textarea id="description" class="form-input" placeholder="Описание"></textarea>
-    <input id="address" class="form-input" placeholder="Адрес">
+<input type="file" id="images" multiple class="form-input">
+<div id="preview" class="image-preview-grid"></div>
 
-    <select id="category" class="form-input">
-      <option>Подвал</option>
-      <option>1 этаж</option>
-      <option>Магазин</option>
-    </select>
-
-    <input type="file" id="images" multiple class="form-input">
-    <div id="preview" class="image-preview-grid"></div>
-
-    <button class="submit-btn" onclick="createObject()">
-      Сохранить объект
-    </button>
-
-  </div>
-
+<button class="submit-btn" onclick="createObject()">Сохранить объект</button>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+</div>
 
 <script>
 const API = "https://api.evgeny-ivanov-premises.ru";
-
 let imageFiles = [];
-const preview = document.getElementById("preview");
 
-const sortable = new Sortable(preview, {
-  animation: 150,
-  onEnd: function () {
-    const newOrder = [];
-    preview.querySelectorAll(".preview-item").forEach(item => {
-      const index = item.dataset.index;
-      newOrder.push(imageFiles[index]);
-    });
-    imageFiles = newOrder;
-    renderPreview();
-  }
-});
+/* ПРОВЕРКА АВТОРИЗАЦИИ */
+fetch(API + "/check-auth", { credentials: "include" })
+.then(res => { if (!res.ok) window.location.href = "login.html"; });
 
 document.getElementById("images").addEventListener("change", function() {
-  Array.from(this.files).forEach(file => {
-    imageFiles.push(file);
-  });
-  renderPreview();
+  imageFiles = Array.from(this.files);
 });
-
-function renderPreview() {
-  preview.innerHTML = "";
-
-  imageFiles.forEach((file, index) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const div = document.createElement("div");
-      div.className = "preview-item";
-      div.dataset.index = index;
-
-      div.innerHTML = `
-        <img src="${e.target.result}">
-        <button type="button" class="remove-btn" onclick="removeImage(${index})">×</button>
-      `;
-
-      preview.appendChild(div);
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-function removeImage(index) {
-  imageFiles.splice(index, 1);
-  renderPreview();
-}
 
 async function createObject() {
   const formData = new FormData();
@@ -102,18 +54,21 @@ async function createObject() {
   formData.append("address", address.value);
   formData.append("category", category.value);
 
-  imageFiles.forEach(file => {
-    formData.append("images", file);
+  imageFiles.forEach(file => formData.append("images", file));
+
+  const res = await fetch(API + "/objects", {
+    method: "POST",
+    body: formData,
+    credentials: "include"
   });
 
-  await fetch(API + "/objects", {
-    method: "POST",
-    body: formData
-  });
+  if (!res.ok) {
+    alert("Ошибка создания объекта");
+    return;
+  }
 
   window.location.href = "index.html";
 }
 </script>
-
 </body>
 </html>
