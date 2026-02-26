@@ -2,21 +2,16 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Вход в админ панель</title>
+  <title>Вход</title>
 </head>
 <body style="display:flex;justify-content:center;align-items:center;height:100vh;">
-
-<script async src="https://telegram.org/js/telegram-widget.js?22"
-  data-telegram-login="PremisesEI_bot"
-  data-size="large"
-  data-request-access="write"
-  data-onauth="onTelegramAuth(user)">
-</script>
 
 <script>
 const API = "https://api.evgeny-ivanov-premises.ru";
 
-function onTelegramAuth(user) {
+window.onTelegramAuth = function(user) {
+  console.log("Telegram user:", user);
+
   fetch(API + "/auth/telegram", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -25,13 +20,25 @@ function onTelegramAuth(user) {
   })
   .then(res => res.json())
   .then(data => {
+    console.log("Server response:", data);
+
     if (data.success) {
       window.location.href = "index.html";
     } else {
       alert("Доступ запрещён");
     }
+  })
+  .catch(err => {
+    console.error("AUTH ERROR:", err);
   });
-}
+};
+</script>
+
+<script async src="https://telegram.org/js/telegram-widget.js?22"
+  data-telegram-login="ТВОЙ_BOT_USERNAME"
+  data-size="large"
+  data-request-access="write"
+  data-onauth="onTelegramAuth(user)">
 </script>
 
 </body>
