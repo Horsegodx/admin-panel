@@ -27,6 +27,15 @@
 </div>
 
 <script>
+fetch("https://api.evgeny-ivanov-premises.ru/check-auth", {
+  credentials: "include"
+})
+.then(res => {
+  if (!res.ok) {
+    window.location.href = "login.html";
+  }
+});
+
 const API = "https://api.evgeny-ivanov-premises.ru";
 let allObjects = [];
 let currentCategory = "Подвал";
