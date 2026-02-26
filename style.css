@@ -640,3 +640,30 @@ textarea.form-input {
   object-fit: cover;
   border-radius: 12px;
 }
+
+
+.preview-item {
+  position: relative;
+  display: inline-block;
+  margin: 8px;
+}
+
+.preview-item img {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.preview-item button {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+}

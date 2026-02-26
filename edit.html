@@ -40,15 +40,27 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
 <script>
 const API = "https://api.evgeny-ivanov-premises.ru";
 const id = new URLSearchParams(window.location.search).get("id");
-let currentObject = null;
+
+let currentObject;
+let imageFiles = [];
+let existingImages = [];
+
+const existingContainer = document.getElementById("existingImages");
+const preview = document.getElementById("preview");
+
+new Sortable(existingContainer, {
+  animation: 150,
+  onEnd: saveOrder
+});
 
 async function loadObject() {
-  const res = await fetch(API + "/objects");
-  const data = await res.json();
-  currentObject = data.find(o => o.id == id);
+  const res = await fetch(API + "/objects/" + id);
+  currentObject = await res.json();
 
   title.value = currentObject.title;
   price.value = currentObject.price;
@@ -56,34 +68,51 @@ async function loadObject() {
   address.value = currentObject.address;
   category.value = currentObject.category;
 
-  renderExistingImages();
+  existingImages = [...currentObject.images];
+  renderExisting();
 }
 
-function renderExistingImages() {
-  const container = document.getElementById("existingImages");
-  container.innerHTML = "";
+function renderExisting() {
+  existingContainer.innerHTML = "";
 
-  if (!currentObject.images) return;
+  existingImages.forEach((img, index) => {
+    const div = document.createElement("div");
+    div.className = "preview-item";
+    div.innerHTML = `
+      <img src="${API + img}">
+      <button onclick="deleteImage(${index})">×</button>
+    `;
+    existingContainer.appendChild(div);
+  });
+}
 
-  currentObject.images.forEach(img => {
-    const image = document.createElement("img");
-    image.src = API + img;
-    container.appendChild(image);
+async function deleteImage(index) {
+  const img = existingImages[index];
+
+  await fetch(API + "/objects/" + id + "/images", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ image: img })
+  });
+
+  existingImages.splice(index, 1);
+  renderExisting();
+}
+
+async function saveOrder() {
+  const newOrder = Array.from(existingContainer.querySelectorAll("img"))
+    .map(img => img.src.replace(API, ""));
+
+  await fetch(API + "/objects/" + id + "/images/order", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ images: newOrder })
   });
 }
 
 document.getElementById("images").addEventListener("change", function() {
-  const preview = document.getElementById("preview");
-  preview.innerHTML = "";
-
   Array.from(this.files).forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = document.createElement("img");
-      img.src = e.target.result;
-      preview.appendChild(img);
-    };
-    reader.readAsDataURL(file);
+    imageFiles.push(file);
   });
 });
 
@@ -96,10 +125,9 @@ async function updateObject() {
   formData.append("address", address.value);
   formData.append("category", category.value);
 
-  const files = document.getElementById("images").files;
-  for (let i = 0; i < files.length; i++) {
-    formData.append("images", files[i]);
-  }
+  imageFiles.forEach(file => {
+    formData.append("images", file);
+  });
 
   await fetch(API + "/objects/" + id, {
     method: "PUT",
@@ -115,7 +143,8 @@ async function deleteObject() {
 }
 
 loadObject();
-</script>
 
+
+</script>
 </body>
 </html>

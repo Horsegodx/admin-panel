@@ -37,6 +37,50 @@ async function loadObjects() {
   renderObjects();
 }
 
+function createSlider(images) {
+  if (!images || images.length === 0) return "";
+
+  return `
+    <div class="property-slider">
+      ${images.map((img, i) => `
+        <img src="${API + img}" class="slide" style="display:${i === 0 ? 'block' : 'none'}">
+      `).join("")}
+      ${images.length > 1 ? `
+        <button class="slider-btn prev">‹</button>
+        <button class="slider-btn next">›</button>
+      ` : ""}
+    </div>
+  `;
+}
+
+function activateSliders() {
+  document.querySelectorAll(".property-slider").forEach(slider => {
+    const slides = slider.querySelectorAll(".slide");
+    let index = 0;
+
+    const prev = slider.querySelector(".prev");
+    const next = slider.querySelector(".next");
+
+    function show(i) {
+      slides.forEach(s => s.style.display = "none");
+      slides[i].style.display = "block";
+    }
+
+    if (prev && next) {
+      prev.onclick = e => {
+        e.stopPropagation();
+        index = (index - 1 + slides.length) % slides.length;
+        show(index);
+      };
+      next.onclick = e => {
+        e.stopPropagation();
+        index = (index + 1) % slides.length;
+        show(index);
+      };
+    }
+  });
+}
+
 function renderObjects() {
   const container = document.getElementById("objectsContainer");
   container.innerHTML = "";
@@ -45,10 +89,6 @@ function renderObjects() {
 
   filtered.forEach(obj => {
 
-    const image = obj.images && obj.images.length > 0
-      ? obj.images[0]
-      : null;
-
     const card = document.createElement("div");
     card.className = "property-card";
     card.onclick = () => {
@@ -56,7 +96,7 @@ function renderObjects() {
     };
 
     card.innerHTML = `
-      ${image ? `<img src="${API}${image}" class="property-image">` : ""}
+      ${createSlider(obj.images)}
       <div class="property-info">
         <h3>${obj.title}</h3>
         <div class="address">${obj.address || ""}</div>
@@ -69,6 +109,8 @@ function renderObjects() {
 
     container.appendChild(card);
   });
+
+  activateSliders();
 }
 
 document.querySelectorAll(".category-link").forEach(btn => {
