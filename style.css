@@ -649,8 +649,8 @@ textarea.form-input {
 }
 
 .preview-item img {
-  width: 120px;
-  height: 90px;
+  width: 240px;
+  height: 180px;
   object-fit: cover;
   border-radius: 12px;
 }
