@@ -1,42 +1,41 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Добавить объект</title>
-  <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Добавить объект</title>
+<link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
 <div class="container">
 
-  <header class="app-header">
-    <a href="index.html" class="header-back">←</a>
-    <div class="header-title">Новый объект</div>
-  </header>
+<header class="app-header">
+<a href="index.html" class="header-back">←</a>
+<div class="header-title">Новый объект</div>
+</header>
 
-  <div class="form-wrapper">
+<div class="form-wrapper">
 
-    <input id="title" class="form-input" placeholder="Название">
-    <input id="price" type="number" class="form-input" placeholder="Цена">
-    <textarea id="description" class="form-input" placeholder="Описание"></textarea>
-    <input id="address" class="form-input" placeholder="Адрес">
+<input id="title" class="form-input" placeholder="Название">
+<input id="price" type="number" class="form-input" placeholder="Цена">
+<textarea id="description" class="form-input" placeholder="Описание"></textarea>
+<input id="address" class="form-input" placeholder="Адрес">
 
-    <select id="category" class="form-input">
-      <option>Подвал</option>
-      <option>1 этаж</option>
-      <option>Магазин</option>
-    </select>
+<select id="category" class="form-input">
+<option>Подвал</option>
+<option>1 этаж</option>
+<option>Магазин</option>
+</select>
 
-    <input type="file" id="images" multiple class="form-input">
-    <div id="preview" class="image-preview-grid"></div>
+<input type="file" id="images" multiple class="form-input">
+<div id="preview" class="image-preview-grid"></div>
 
-    <button class="submit-btn" onclick="createObject()">
-      Сохранить объект
-    </button>
+<button class="submit-btn" onclick="createObject()">
+Сохранить объект
+</button>
 
-  </div>
-
+</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -53,12 +52,12 @@ async function checkAuth() {
     window.location.href = "login.html";
   }
 }
-
 checkAuth();
 
 let imageFiles = [];
 const preview = document.getElementById("preview");
 
+/* ===== Sortable ===== */
 new Sortable(preview, {
   animation: 150,
   onEnd: function () {
@@ -72,18 +71,19 @@ new Sortable(preview, {
   }
 });
 
+/* ===== Загрузка файлов ===== */
 document.getElementById("images").addEventListener("change", function() {
-  Array.from(this.files).forEach(file => {
-    imageFiles.push(file);
-  });
+  imageFiles = Array.from(this.files);
   renderPreview();
 });
 
+/* ===== Превью (как в редактировании) ===== */
 function renderPreview() {
   preview.innerHTML = "";
 
   imageFiles.forEach((file, index) => {
     const reader = new FileReader();
+
     reader.onload = e => {
       const div = document.createElement("div");
       div.className = "preview-item";
@@ -96,6 +96,7 @@ function renderPreview() {
 
       preview.appendChild(div);
     };
+
     reader.readAsDataURL(file);
   });
 }
@@ -105,7 +106,14 @@ function removeImage(index) {
   renderPreview();
 }
 
+/* ===== Создание объекта ===== */
 async function createObject() {
+
+  if (!title.value || !price.value) {
+    alert("Заполните название и цену");
+    return;
+  }
+
   const formData = new FormData();
 
   formData.append("title", title.value);
@@ -118,18 +126,27 @@ async function createObject() {
     formData.append("images", file);
   });
 
-  const res = await fetch(API + "/objects", {
-    method: "POST",
-    body: formData,
-    credentials: "include"
-  });
+  try {
 
-  if (!res.ok) {
-    alert("Ошибка создания объекта");
-    return;
+    const res = await fetch(API + "/objects", {
+      method: "POST",
+      body: formData,
+      credentials: "include"
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("CREATE ERROR:", errorText);
+      alert("Ошибка создания объекта");
+      return;
+    }
+
+    window.location.href = "index.html";
+
+  } catch (err) {
+    console.error("CREATE FETCH ERROR:", err);
+    alert("Сервер недоступен");
   }
-
-  window.location.href = "index.html";
 }
 </script>
 
