@@ -692,3 +692,11 @@ textarea.form-input {
   background: #ff3b3b;
   transform: scale(1.1);
 }
+
+.preview-item button {
+  opacity: 0;
+}
+
+.preview-item:hover button {
+  opacity: 1;
+}
