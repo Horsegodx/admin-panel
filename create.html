@@ -43,6 +43,9 @@
 <script>
 const API = "https://api.evgeny-ivanov-premises.ru";
 
+/* =========================
+   AUTH CHECK
+========================= */
 async function checkAuth() {
   const res = await fetch(API + "/check-auth", {
     credentials: "include"
@@ -54,16 +57,21 @@ async function checkAuth() {
 }
 checkAuth();
 
+/* =========================
+   IMAGE LOGIC
+========================= */
+
 let imageFiles = [];
 const preview = document.getElementById("preview");
+const imageInput = document.getElementById("images");
 
-/* ===== Sortable ===== */
+/* ===== Sortable (перетаскивание) ===== */
 new Sortable(preview, {
   animation: 150,
   onEnd: function () {
     const newOrder = [];
     preview.querySelectorAll(".preview-item").forEach(item => {
-      const index = item.dataset.index;
+      const index = Number(item.dataset.index);
       newOrder.push(imageFiles[index]);
     });
     imageFiles = newOrder;
@@ -71,13 +79,21 @@ new Sortable(preview, {
   }
 });
 
-/* ===== Загрузка файлов ===== */
-document.getElementById("images").addEventListener("change", function() {
-  imageFiles = Array.from(this.files);
+/* ===== Загрузка файлов (добавляет, а не заменяет) ===== */
+imageInput.addEventListener("change", function() {
+  const files = Array.from(this.files);
+
+  files.forEach(file => {
+    imageFiles.push(file);
+  });
+
   renderPreview();
+
+  /* очищаем input чтобы можно было выбрать те же файлы снова */
+  imageInput.value = "";
 });
 
-/* ===== Превью (как в редактировании) ===== */
+/* ===== Превью ===== */
 function renderPreview() {
   preview.innerHTML = "";
 
@@ -91,8 +107,13 @@ function renderPreview() {
 
       div.innerHTML = `
         <img src="${e.target.result}">
-        <button type="button" class="remove-btn" onclick="removeImage(${index})">×</button>
+        <button type="button" class="remove-btn">×</button>
       `;
+
+      div.querySelector(".remove-btn").onclick = () => {
+        imageFiles.splice(index, 1);
+        renderPreview();
+      };
 
       preview.appendChild(div);
     };
@@ -101,12 +122,10 @@ function renderPreview() {
   });
 }
 
-function removeImage(index) {
-  imageFiles.splice(index, 1);
-  renderPreview();
-}
+/* =========================
+   CREATE OBJECT
+========================= */
 
-/* ===== Создание объекта ===== */
 async function createObject() {
 
   if (!title.value || !price.value) {
