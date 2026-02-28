@@ -28,7 +28,7 @@
 <option>Магазин</option>
 </select>
 
-<input type="file" id="images" multiple class="form-input">
+<input type="file" id="images" multiple class="form-input" accept="image/*">
 <div id="preview" class="image-preview-grid"></div>
 
 <button class="submit-btn" onclick="createObject()">
@@ -43,9 +43,9 @@
 <script>
 const API = "https://api.evgeny-ivanov-premises.ru";
 
-/* =========================
-   AUTH CHECK
-========================= */
+const MAX_FILES = 10;
+const MAX_FILE_SIZE = 12 * 1024 * 1024; // 12MB
+
 async function checkAuth() {
   const res = await fetch(API + "/check-auth", {
     credentials: "include"
@@ -57,15 +57,11 @@ async function checkAuth() {
 }
 checkAuth();
 
-/* =========================
-   IMAGE LOGIC
-========================= */
-
 let imageFiles = [];
 const preview = document.getElementById("preview");
 const imageInput = document.getElementById("images");
 
-/* ===== Sortable (перетаскивание) ===== */
+/* ===== Sortable ===== */
 new Sortable(preview, {
   animation: 150,
   onEnd: function () {
@@ -79,17 +75,32 @@ new Sortable(preview, {
   }
 });
 
-/* ===== Загрузка файлов (добавляет, а не заменяет) ===== */
+/* ===== Загрузка файлов с лимитами ===== */
 imageInput.addEventListener("change", function() {
+
   const files = Array.from(this.files);
 
-  files.forEach(file => {
+  for (let file of files) {
+
+    if (imageFiles.length >= MAX_FILES) {
+      alert("Можно загрузить максимум 10 фотографий");
+      break;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      alert("Можно загружать только изображения");
+      continue;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`Файл "${file.name}" превышает 12 МБ`);
+      continue;
+    }
+
     imageFiles.push(file);
-  });
+  }
 
   renderPreview();
-
-  /* очищаем input чтобы можно было выбрать те же файлы снова */
   imageInput.value = "";
 });
 
@@ -122,10 +133,7 @@ function renderPreview() {
   });
 }
 
-/* =========================
-   CREATE OBJECT
-========================= */
-
+/* ===== Создание объекта ===== */
 async function createObject() {
 
   if (!title.value || !price.value) {
