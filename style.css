@@ -765,21 +765,11 @@ textarea.form-input {
 /* Ограничение описания в карточке */
 .property-description {
   display: -webkit-box;
-  -webkit-line-clamp: 4; /* максимум 4 строки */
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.5;
-  max-height: 6em;
-  position: relative;
-}
 
-/* Небольшой эффект затемнения снизу */
-.property-description::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 100%;
-  height: 1.5em;
-  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.8));
+  white-space: pre-line;      /* Сохраняет переносы строк */
+  line-height: 1.6;           /* Красивый межстрочный интервал */
+  font-size: 15px;
 }
