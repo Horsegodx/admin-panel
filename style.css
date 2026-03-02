@@ -610,6 +610,7 @@ textarea.form-input {
   resize: none;
   overflow: hidden;
   min-height: 120px;
+  line-height: 1.5;
 }
 
 .submit-btn {

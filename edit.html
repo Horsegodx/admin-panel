@@ -215,17 +215,30 @@ async function confirmDelete() {
 
   window.location.href = "index.html";
 }
+
+
 function autoResizeTextarea(textarea) {
   textarea.style.height = "auto";
-  textarea.style.height = textarea.scrollHeight + "px";
+
+  const maxHeight = 1000; // защита от бесконечного роста
+  textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + "px";
 }
 
-document.querySelectorAll("textarea").forEach(textarea => {
-  autoResizeTextarea(textarea);
+const descriptionField = document.getElementById("description");
 
-  textarea.addEventListener("input", function() {
-    autoResizeTextarea(this);
-  });
+// при вводе
+descriptionField.addEventListener("input", function() {
+  autoResizeTextarea(this);
+});
+
+// при вставке текста
+descriptionField.addEventListener("paste", function() {
+  setTimeout(() => autoResizeTextarea(this), 0);
+});
+
+// при загрузке страницы
+window.addEventListener("load", function() {
+  autoResizeTextarea(descriptionField);
 });
 
 loadObject();
