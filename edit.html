@@ -215,6 +215,18 @@ async function confirmDelete() {
 
   window.location.href = "index.html";
 }
+function autoResizeTextarea(textarea) {
+  textarea.style.height = "auto";
+  textarea.style.height = textarea.scrollHeight + "px";
+}
+
+document.querySelectorAll("textarea").forEach(textarea => {
+  autoResizeTextarea(textarea);
+
+  textarea.addEventListener("input", function() {
+    autoResizeTextarea(this);
+  });
+});
 
 loadObject();
 </script>

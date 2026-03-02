@@ -43,7 +43,7 @@
 <script>
 const API = "https://api.evgeny-ivanov-premises.ru";
 
-const MAX_FILES = 10;
+const MAX_FILES = 23;
 const MAX_FILE_SIZE = 12 * 1024 * 1024;
 
 async function checkAuth() {
@@ -92,7 +92,7 @@ imageInput.addEventListener("change", function() {
   for (let file of files) {
 
     if (imageFiles.length >= MAX_FILES) {
-      alert("Можно загрузить максимум 10 фотографий");
+      alert("Можно загрузить максимум 23 фотографий");
       break;
     }
 
@@ -192,6 +192,19 @@ async function createObject() {
     alert("Сервер недоступен");
   }
 }
+
+function autoResizeTextarea(textarea) {
+  textarea.style.height = "auto";
+  textarea.style.height = textarea.scrollHeight + "px";
+}
+
+document.querySelectorAll("textarea").forEach(textarea => {
+  autoResizeTextarea(textarea);
+
+  textarea.addEventListener("input", function() {
+    autoResizeTextarea(this);
+  });
+});
 </script>
 
 </body>
