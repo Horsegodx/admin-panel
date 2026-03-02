@@ -609,8 +609,8 @@ body {
 textarea.form-input {
   resize: none;
   overflow: hidden;
-  min-height: 120px;
   line-height: 1.5;
+  min-height: 0;
 }
 
 .submit-btn {
