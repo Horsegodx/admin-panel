@@ -7,26 +7,12 @@
   <link rel="stylesheet" href="./style.css">
 
   <style>
-    /* Ограничение описания в карточке */
+    /* Нормальный стиль описания */
     .property-description {
-      display: -webkit-box;
-      -webkit-line-clamp: 4; /* максимум 4 строки */
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      line-height: 1.5;
-      max-height: 6em;
-      position: relative;
-    }
-
-    /* Плавное затемнение снизу */
-    .property-description::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 100%;
-      height: 1.5em;
-      background: linear-gradient(to bottom, transparent, #fff);
+      white-space: pre-line;   /* сохраняет переносы строк */
+      line-height: 1.6;
+      font-size: 15px;
+      margin-top: 8px;
     }
   </style>
 </head>
@@ -67,6 +53,21 @@ checkAuth();
 
 let allObjects = [];
 let currentCategory = "Подвал";
+
+/* =========================
+   ОБРЕЗАНИЕ ТЕКСТА
+========================= */
+function truncateText(text, maxLength = 280) {
+  if (!text) return "";
+
+  if (text.length <= maxLength) {
+    return text.trim();
+  }
+
+  return text.substring(0, maxLength).trim() + "\n\n...";
+}
+
+/* ========================= */
 
 async function loadObjects() {
   const res = await fetch(API + "/objects", {
@@ -145,7 +146,7 @@ function renderObjects() {
         <h3>${obj.title}</h3>
         <div class="address">${obj.address || ""}</div>
         <div class="property-description">
-          ${obj.description || ""}
+          ${truncateText(obj.description)}
         </div>
         <div class="property-price">
           ${Number(obj.price).toLocaleString()} ₽

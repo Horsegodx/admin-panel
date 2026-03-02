@@ -762,14 +762,3 @@ textarea.form-input {
 }
 
 
-/* Ограничение описания в карточке */
-.property-description {
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-
-  white-space: pre-line;      /* Сохраняет переносы строк */
-  line-height: 1.6;           /* Красивый межстрочный интервал */
-  font-size: 15px;
-}
