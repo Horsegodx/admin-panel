@@ -49,13 +49,13 @@ let imageFiles = [];
 const preview = document.getElementById("preview");
 const imageInput = document.getElementById("images");
 
-/* ===== Sortable — ПРОСТО как в edit ===== */
+/* ===== Sortable (просто и стабильно) ===== */
 new Sortable(preview, {
   animation: 150
 });
 
 /* ===== Загрузка файлов ===== */
-imageInput.addEventListener("change", function() {
+imageInput.addEventListener("change", function () {
 
   const files = Array.from(this.files);
 
@@ -89,22 +89,23 @@ function renderPreview() {
 
   preview.innerHTML = "";
 
-  imageFiles.forEach((file) => {
+  imageFiles.forEach((file, index) => {
 
     const reader = new FileReader();
 
-    reader.onload = e => {
+    reader.onload = function (e) {
 
       const div = document.createElement("div");
       div.className = "preview-item";
+      div.dataset.index = index;
 
       div.innerHTML = `
         <img src="${e.target.result}">
         <button type="button" class="remove-btn">×</button>
       `;
 
-      div.querySelector(".remove-btn").onclick = () => {
-        imageFiles = imageFiles.filter(f => f !== file);
+      div.querySelector(".remove-btn").onclick = function () {
+        imageFiles.splice(index, 1);
         renderPreview();
       };
 
@@ -131,14 +132,12 @@ async function createObject() {
   formData.append("address", address.value);
   formData.append("category", category.value);
 
-  /* ВАЖНО: получаем порядок прямо из DOM */
-  const orderedImgs = Array.from(preview.querySelectorAll("img"));
+  /* Берём порядок из DOM */
+  const orderedItems = Array.from(preview.querySelectorAll(".preview-item"));
 
-  orderedImgs.forEach(img => {
-    const file = imageFiles.find(f => img.src.includes(f.name));
-    if (file) {
-      formData.append("images", file);
-    }
+  orderedItems.forEach(item => {
+    const index = Number(item.dataset.index);
+    formData.append("images", imageFiles[index]);
   });
 
   try {
