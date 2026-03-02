@@ -62,12 +62,10 @@ async function checkAuth() {
   const res = await fetch(API + "/check-auth", {
     credentials: "include"
   });
-
   if (!res.ok) {
     window.location.href = "login.html";
   }
 }
-
 checkAuth();
 
 let imageFiles = [];
@@ -75,11 +73,39 @@ let existingImages = [];
 
 const existingContainer = document.getElementById("existingImages");
 const preview = document.getElementById("preview");
+const descriptionField = document.getElementById("description");
+
+
+
+/* ================================
+   AUTO RESIZE TEXTAREA (СТАБИЛЬНО)
+================================ */
+
+function autoResizeTextarea(textarea) {
+  textarea.style.height = "0px";
+  textarea.style.height = textarea.scrollHeight + "px";
+}
+
+descriptionField.addEventListener("input", function() {
+  autoResizeTextarea(this);
+});
+
+
+
+/* ================================
+   SORT EXISTING IMAGES
+================================ */
 
 new Sortable(existingContainer, {
   animation: 150,
   onEnd: saveOrder
 });
+
+
+
+/* ================================
+   LOAD OBJECT
+================================ */
 
 async function loadObject() {
   const res = await fetch(API + "/objects/" + id, {
@@ -93,16 +119,23 @@ async function loadObject() {
 
   const currentObject = await res.json();
 
-  title.value = currentObject.title;
-  price.value = currentObject.price;
-  description.value = currentObject.description;
-  autoResizeTextarea(description);
-  address.value = currentObject.address;
-  category.value = currentObject.category;
+  title.value = currentObject.title || "";
+  price.value = currentObject.price || "";
+  descriptionField.value = currentObject.description || "";
+  address.value = currentObject.address || "";
+  category.value = currentObject.category || "";
+
+  autoResizeTextarea(descriptionField);
 
   existingImages = [...currentObject.images];
   renderExisting();
 }
+
+
+
+/* ================================
+   EXISTING IMAGES
+================================ */
 
 function renderExisting() {
   existingContainer.innerHTML = "";
@@ -146,6 +179,12 @@ async function saveOrder() {
   });
 }
 
+
+
+/* ================================
+   NEW IMAGES
+================================ */
+
 document.getElementById("images").addEventListener("change", function() {
   Array.from(this.files).forEach(file => {
     imageFiles.push(file);
@@ -178,12 +217,18 @@ function removeNewImage(index) {
   renderNewPreview();
 }
 
+
+
+/* ================================
+   UPDATE OBJECT
+================================ */
+
 async function updateObject() {
   const formData = new FormData();
 
   formData.append("title", title.value);
   formData.append("price", price.value);
-  formData.append("description", description.value);
+  formData.append("description", descriptionField.value);
   formData.append("address", address.value);
   formData.append("category", category.value);
 
@@ -199,6 +244,12 @@ async function updateObject() {
 
   window.location.href = "index.html";
 }
+
+
+
+/* ================================
+   DELETE OBJECT
+================================ */
 
 function deleteObject() {
   document.getElementById("deleteModal").style.display = "block";
@@ -218,29 +269,10 @@ async function confirmDelete() {
 }
 
 
-function autoResizeTextarea(textarea) {
-  textarea.style.height = "auto";
 
-  const maxHeight = 1000; // защита от бесконечного роста
-  textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + "px";
-}
-
-const descriptionField = document.getElementById("description");
-
-// при вводе
-descriptionField.addEventListener("input", function() {
-  autoResizeTextarea(this);
-});
-
-// при вставке текста
-descriptionField.addEventListener("paste", function() {
-  setTimeout(() => autoResizeTextarea(this), 0);
-});
-
-// при загрузке страницы
-window.addEventListener("load", function() {
-  autoResizeTextarea(descriptionField);
-});
+/* ================================
+   START
+================================ */
 
 loadObject();
 </script>

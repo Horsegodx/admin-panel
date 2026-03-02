@@ -770,4 +770,11 @@ textarea.form-input {
   transform: scale(1.1);
 }
 
+textarea {
+  min-height: 120px;
+  resize: none;
+  overflow: hidden !important;
+  height: auto !important;
+}
+
 
