@@ -38,54 +38,42 @@
 </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-
 <script>
 const API = "https://api.evgeny-ivanov-premises.ru";
 
 const MAX_FILES = 10;
-const MAX_FILE_SIZE = 12 * 1024 * 1024; // 12MB
-
-async function checkAuth() {
-  const res = await fetch(API + "/check-auth", {
-    credentials: "include"
-  });
-
-  if (!res.ok) {
-    window.location.href = "login.html";
-  }
-}
-checkAuth();
+const MAX_FILE_SIZE = 12 * 1024 * 1024;
 
 let imageFiles = [];
 const preview = document.getElementById("preview");
 const imageInput = document.getElementById("images");
 
-/* ===== Sortable ===== */
+/* ===== Sortable (правильная версия) ===== */
 new Sortable(preview, {
   animation: 150,
   onEnd: function () {
     const newOrder = [];
     preview.querySelectorAll(".preview-item").forEach(item => {
-      const index = Number(item.dataset.index);
-      newOrder.push(imageFiles[index]);
+      const fileId = item.dataset.id;
+      const file = imageFiles.find(f => f._id === fileId);
+      if (file) newOrder.push(file);
     });
     imageFiles = newOrder;
-    renderPreview();
   }
 });
 
-/* ===== Загрузка файлов с лимитами ===== */
+/* ===== Загрузка файлов ===== */
 imageInput.addEventListener("change", function() {
 
   const files = Array.from(this.files);
 
-  for (let file of files) {
+  if (imageFiles.length + files.length > MAX_FILES) {
+    alert(`Максимум ${MAX_FILES} фотографий`);
+    imageInput.value = "";
+    return;
+  }
 
-    if (imageFiles.length >= MAX_FILES) {
-      alert("Можно загрузить максимум 10 фотографий");
-      break;
-    }
+  for (let file of files) {
 
     if (!file.type.startsWith("image/")) {
       alert("Можно загружать только изображения");
@@ -97,6 +85,8 @@ imageInput.addEventListener("change", function() {
       continue;
     }
 
+    // создаём уникальный ID для сортировки
+    file._id = crypto.randomUUID();
     imageFiles.push(file);
   }
 
@@ -108,13 +98,13 @@ imageInput.addEventListener("change", function() {
 function renderPreview() {
   preview.innerHTML = "";
 
-  imageFiles.forEach((file, index) => {
+  imageFiles.forEach((file) => {
     const reader = new FileReader();
 
     reader.onload = e => {
       const div = document.createElement("div");
       div.className = "preview-item";
-      div.dataset.index = index;
+      div.dataset.id = file._id;
 
       div.innerHTML = `
         <img src="${e.target.result}">
@@ -122,7 +112,7 @@ function renderPreview() {
       `;
 
       div.querySelector(".remove-btn").onclick = () => {
-        imageFiles.splice(index, 1);
+        imageFiles = imageFiles.filter(f => f._id !== file._id);
         renderPreview();
       };
 
@@ -154,7 +144,6 @@ async function createObject() {
   });
 
   try {
-
     const res = await fetch(API + "/objects", {
       method: "POST",
       body: formData,
@@ -162,8 +151,6 @@ async function createObject() {
     });
 
     if (!res.ok) {
-      const errorText = await res.text();
-      console.error("CREATE ERROR:", errorText);
       alert("Ошибка создания объекта");
       return;
     }
@@ -171,7 +158,6 @@ async function createObject() {
     window.location.href = "index.html";
 
   } catch (err) {
-    console.error("CREATE FETCH ERROR:", err);
     alert("Сервер недоступен");
   }
 }
