@@ -194,10 +194,13 @@ async function createObject() {
 }
 
 function autoResizeTextarea(textarea) {
-  textarea.style.height = "auto";
 
-  const maxHeight = 1000; // защита от бесконечного роста
-  textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + "px";
+  const scrollY = window.scrollY;   // запоминаем позицию
+
+  textarea.style.height = "auto";
+  textarea.style.height = textarea.scrollHeight + "px";
+
+  window.scrollTo(0, scrollY);      // возвращаем назад
 }
 
 const descriptionField = document.getElementById("description");

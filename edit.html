@@ -82,8 +82,13 @@ const descriptionField = document.getElementById("description");
 ================================ */
 
 function autoResizeTextarea(textarea) {
+
+  const scrollY = window.scrollY;   // запоминаем позицию
+
   textarea.style.height = "auto";
   textarea.style.height = textarea.scrollHeight + "px";
+
+  window.scrollTo(0, scrollY);      // возвращаем назад
 }
 
 descriptionField.addEventListener("input", function () {
