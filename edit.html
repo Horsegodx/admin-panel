@@ -78,15 +78,15 @@ const descriptionField = document.getElementById("description");
 
 
 /* ================================
-   AUTO RESIZE TEXTAREA (СТАБИЛЬНО)
+   AUTO RESIZE TEXTAREA
 ================================ */
 
 function autoResizeTextarea(textarea) {
-  textarea.style.height = "0px";
+  textarea.style.height = "auto";
   textarea.style.height = textarea.scrollHeight + "px";
 }
 
-descriptionField.addEventListener("input", function() {
+descriptionField.addEventListener("input", function () {
   autoResizeTextarea(this);
 });
 
@@ -125,7 +125,10 @@ async function loadObject() {
   address.value = currentObject.address || "";
   category.value = currentObject.category || "";
 
-  autoResizeTextarea(descriptionField);
+  // ВАЖНО: ждём следующий кадр отрисовки
+  requestAnimationFrame(() => {
+    autoResizeTextarea(descriptionField);
+  });
 
   existingImages = [...currentObject.images];
   renderExisting();
@@ -185,7 +188,7 @@ async function saveOrder() {
    NEW IMAGES
 ================================ */
 
-document.getElementById("images").addEventListener("change", function() {
+document.getElementById("images").addEventListener("change", function () {
   Array.from(this.files).forEach(file => {
     imageFiles.push(file);
   });
