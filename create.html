@@ -49,15 +49,9 @@ let imageFiles = [];
 const preview = document.getElementById("preview");
 const imageInput = document.getElementById("images");
 
-/* ===== Sortable (как в редактировании) ===== */
+/* ===== Sortable — ПРОСТО как в edit ===== */
 new Sortable(preview, {
-  animation: 200,
-  ghostClass: "sortable-ghost",
-  chosenClass: "sortable-chosen",
-  dragClass: "sortable-drag",
-  forceFallback: true,
-  fallbackOnBody: true,
-  swapThreshold: 0.65
+  animation: 150
 });
 
 /* ===== Загрузка файлов ===== */
@@ -95,7 +89,7 @@ function renderPreview() {
 
   preview.innerHTML = "";
 
-  imageFiles.forEach((file, index) => {
+  imageFiles.forEach((file) => {
 
     const reader = new FileReader();
 
@@ -110,7 +104,7 @@ function renderPreview() {
       `;
 
       div.querySelector(".remove-btn").onclick = () => {
-        imageFiles.splice(index, 1);
+        imageFiles = imageFiles.filter(f => f !== file);
         renderPreview();
       };
 
@@ -137,13 +131,14 @@ async function createObject() {
   formData.append("address", address.value);
   formData.append("category", category.value);
 
-  // ВАЖНО: берем порядок прямо из DOM
-  const orderedImages = Array.from(preview.querySelectorAll("img"))
-    .map(img => img.src);
+  /* ВАЖНО: получаем порядок прямо из DOM */
+  const orderedImgs = Array.from(preview.querySelectorAll("img"));
 
-  orderedImages.forEach((src, index) => {
-    const file = imageFiles[index];
-    formData.append("images", file);
+  orderedImgs.forEach(img => {
+    const file = imageFiles.find(f => img.src.includes(f.name));
+    if (file) {
+      formData.append("images", file);
+    }
   });
 
   try {
