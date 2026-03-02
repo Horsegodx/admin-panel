@@ -66,7 +66,20 @@ const imageInput = document.getElementById("images");
 
 /* ===== Drag & Drop ===== */
 new Sortable(preview, {
-  animation: 150
+  animation: 150,
+  onEnd: function () {
+
+    const newOrder = [];
+    const items = preview.querySelectorAll(".preview-item");
+
+    items.forEach(item => {
+      const index = Number(item.dataset.index);
+      newOrder.push(imageFiles[index]);
+    });
+
+    imageFiles = newOrder;
+    renderPreview();
+  }
 });
 
 /* ===== Загрузка файлов ===== */
@@ -103,7 +116,7 @@ function renderPreview() {
 
   preview.innerHTML = "";
 
-  imageFiles.forEach((file) => {
+  imageFiles.forEach((file, index) => {
 
     const reader = new FileReader();
 
@@ -111,6 +124,7 @@ function renderPreview() {
 
       const div = document.createElement("div");
       div.className = "preview-item";
+      div.dataset.index = index;
 
       div.innerHTML = `
         <img src="${e.target.result}">
@@ -118,7 +132,7 @@ function renderPreview() {
       `;
 
       div.querySelector(".remove-btn").onclick = function() {
-        imageFiles = imageFiles.filter(f => f !== file);
+        imageFiles.splice(index, 1);
         renderPreview();
       };
 
@@ -148,11 +162,8 @@ async function createObject() {
   formData.append("address", address.value);
   formData.append("category", category.value);
 
-  // берём порядок прямо из DOM
-  const orderedItems = Array.from(preview.querySelectorAll(".preview-item"));
-
-  orderedItems.forEach((item, index) => {
-    formData.append("images", imageFiles[index]);
+  imageFiles.forEach(file => {
+    formData.append("images", file);
   });
 
   try {
